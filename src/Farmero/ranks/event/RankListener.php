@@ -18,6 +18,7 @@ class RankListener implements Listener {
         $player = $event->getPlayer();
         Ranks::getInstance()->getRanksManager()->createPlayerProfile($player);
         $this->updateDisplayName($player);
+        $player->sendTitle("DEBUG");
     }
 
     public function onChat(PlayerChatEvent $event): void {
