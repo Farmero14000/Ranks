@@ -7,6 +7,8 @@ namespace Farmero\ranks;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 
+use Farmero\ranks\Ranks;
+
 class RanksManager {
 
     private $plugin;
@@ -46,7 +48,6 @@ class RanksManager {
             $this->playerRanks->set($player->getName(), $rank);
             $this->playerRanks->save();
             $this->updatePlayerPermissions($player, $rank);
-            Ranks::getInstance()->getServer()->getPluginManager()->callEvent(new PlayerRankChangeEvent($player, $rank));
         }
     }
 
@@ -63,7 +64,7 @@ class RanksManager {
     public function getRankPermissions(string $rank): array {
         $permissions = [];
         $hierarchy = $this->ranks->get("hierarchy", []);
-
+    
         foreach ($hierarchy as $hierarchyRank) {
             if ($hierarchyRank === $rank || $this->ranks->exists("$hierarchyRank.permissions")) {
                 $permissions = array_merge($permissions, $this->ranks->getNested("$hierarchyRank.permissions", []));
@@ -72,7 +73,7 @@ class RanksManager {
                 break;
             }
         }
-
+    
         return $permissions;
     }
 
