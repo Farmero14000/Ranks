@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Farmero\ranks;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
 
 use Farmero\ranks\Ranks;
@@ -19,6 +19,10 @@ class RanksManager {
         $this->plugin = $plugin;
         $this->loadRanks();
         $this->playerRanks = new Config($this->plugin->getDataFolder() . "player_ranks.json", Config::JSON, []);
+    }
+
+    public function loadRanks(): void {
+        $this->ranks = new Config($this->plugin->getDataFolder() . "ranks.yml", Config::YAML);
     }
 
     public function loadPlayerRanks(): void {
