@@ -9,38 +9,28 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\player\Player;
 use pocketmine\player\chat\LegacyRawChatFormatter;
+use pocketmine\utils\TextFormat as TF;
 
 use Farmero\ranks\Ranks;
 
 class RankListener implements Listener {
 
-    public function onJoin(PlayerJoinEvent $event){
+    public function onJoin(PlayerJoinEvent $event) {
         $player = $event->getPlayer();
         Ranks::getInstance()->getRanksManager()->createPlayerProfile($player);
-        $this->updateDisplayName($player);
-        $player->sendTitle("DEBUG");
+        $this->updatePlayerDisplayName($player);
     }
 
-    public function onChat(PlayerChatEvent $event): void {
+    public function onPlayerChat(PlayerChatEvent $event) {
         $player = $event->getPlayer();
-        $rankManager = Ranks::getInstance()->getRanksManager();
-        $rank = $rankManager->getRank($player);
-        $rankData = $rankManager->getRanks()[$rank] ?? null;
-        if ($rankData !== null) {
-            $rankDisplay = $rankData["rank_display"];
-            $playerName = $player->getName();
-            $message = $event->getMessage();
-            $event->setFormatter(new LegacyRawChatFormatter("[{$rankDisplay}] {$playerName}: {$message}"));
-        }
+        $rank = Ranks::getInstance()->getRanksManager()->getRank($player);
+        $rankDisplay = $rank ? Ranks::getInstance()->getRanksManager()->getRankDisplay($player) : "";
+        $event->setFormatter(new LegacyRawChatFormatter(TF::GREEN . "[" . $rankDisplay . "] " . $player->getName() . ": " . $event->getMessage()));
     }
 
-    private function updateDisplayName(Player $player): void {
-        $rankManager = Ranks::getInstance()->getRanksManager();
-        $rank = $rankManager->getRank($player);
-        $rankData = $rankManager->getRanks()[$rank] ?? null;
-        if ($rankData !== null) {
-            $rankDisplay = $rankData["rank_display"];
-            $player->setDisplayName("[{$rankDisplay}] " . $player->getName());
-        }
+    public function updatePlayerDisplayName(Player $player): void {
+        $rank = Ranks::getInstance()->getRanksManager()->getRank($player);
+        $rankDisplay = $rank ? Ranks::getInstance()->getRanksManager()->getRankDisplay($player) : "";
+        $player->setDisplayName(TF::GREEN . "[" . $rankDisplay . "] " . $player->getName());
     }
 }
