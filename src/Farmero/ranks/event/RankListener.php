@@ -8,7 +8,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\player\Player;
-use pocketmine\player\chat\\LegacyRawChatFormatter;
+use pocketmine\player\chat\LegacyRawChatFormatter;
 
 use Farmero\ranks\Ranks;
 
