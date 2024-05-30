@@ -61,6 +61,11 @@ class RanksManager {
         return $this->ranks->getAll();
     }
 
+    public function getRankDisplay(Player $player): ?string {
+        $rank = $this->getRank($player);
+        return $this->ranks->getNested("ranks.$rank.rank_display", $rank);
+    }
+
     public function getRankPermissions(string $rank): array {
         $permissions = [];
         $hierarchy = $this->ranks->get("hierarchy", []);
@@ -73,7 +78,6 @@ class RanksManager {
                 break;
             }
         }
-    
         return $permissions;
     }
 
