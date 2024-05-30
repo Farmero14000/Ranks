@@ -1,0 +1,25 @@
+default_rank: "member"
+
+ranks:
+  member:
+    rank_display: "Member"
+    permissions:
+      - "example.permission3"
+  vip:
+    rank_display: "VIP"
+    permissions:
+      - "example.permission4"
+  admin:
+    rank_display: "Admin"
+    permissions:
+      - "example.permission5"
+  owner:
+    rank_display: "Owner"
+    permissions:
+      - "example.permission6"
+
+hierarchy:
+  - "member"
+  - "vip"
+  - "admin"
+  - "owner"
