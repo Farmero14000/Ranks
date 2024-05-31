@@ -18,6 +18,7 @@ class RanksManager {
     private $ranksData;
     private $ranksConfig;
     private $defaultRank;
+    private $tempRanksData;
 
     public function __construct() {
         $this->loadRanks();
