@@ -176,6 +176,9 @@ class RanksManager {
             unset($this->tempRanksData[$player->getName()]);
             $this->updatePlayerDisplayName($player);
         }
+
+    public function getTempRankData(Player $player): ?array {
+        return $this->tempRanksData[$player->getName()] ?? null;
     }
 
     private function formatTime(int $seconds): string {
