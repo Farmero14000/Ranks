@@ -77,7 +77,15 @@ class RanksManager {
         return $this->ranksConfig['ranks'][$rank]['rank_display'] ?? $rank;
     }
 
-    private function updatePlayerDisplayName(Player $player): void {
+    public function createPlayerProfile(Player $player): void {
+        if (!isset($this->ranksData[$player->getName()])) {
+            $this->ranksData[$player->getName()] = $this->defaultRank;
+            $this->saveRanks();
+            $this->updatePlayerDisplayName($player);
+        }
+    }
+
+    public function updatePlayerDisplayName(Player $player): void {
         $rank = $this->getRank($player);
         $rankDisplay = $this->getRankDisplay($rank);
         $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName());
