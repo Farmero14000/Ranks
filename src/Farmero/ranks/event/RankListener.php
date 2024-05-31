@@ -16,9 +16,19 @@ class RankListener implements Listener {
 
     public function onJoin(PlayerJoinEvent $event) {
         $player = $event->getPlayer();
-        Ranks::getInstance()->getRanksManager()->createPlayerProfile($player);
-        Ranks::getInstance()->getRanksManager()->updatePlayerDisplayName($player);
-        Ranks::getInstance()->getRanksManager()->updateTempRankDisplay($player);
+        $ranksManager = Ranks::getInstance()->getRanksManager();
+        $rank = $ranksManager->getRank($player);
+        $tempRankData = $ranksManager->getTempRankData($player);
+        if ($tempRankData !== null) {
+            $expiryTime = $tempRankData['expiry'];
+            $currentTime = time();
+            $timeLeft = max(0, $expiryTime - $currentTime);
+
+            $ranksManager->updateTempRankDisplay($player, $rank, $timeLeft);
+        } else {
+            $ranksManager->updatePlayerDisplayName($player);
+        }
+        $ranksManager->createPlayerProfile($player);
     }
 
     public function onPlayerChat(PlayerChatEvent $event) {
