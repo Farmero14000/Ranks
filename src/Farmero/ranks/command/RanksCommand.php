@@ -12,8 +12,6 @@ use Farmero\ranks\Ranks;
 
 class RanksCommand extends Command {
 
-    private $plugin;
-
     public function __construct() {
         parent::__construct("rank");
         $this->setLabel("rank");
