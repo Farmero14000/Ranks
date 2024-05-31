@@ -54,7 +54,7 @@ class RanksManager {
     }
 
     public function getAllRanks(): array {
-        $config = $this->getConfig()->getAll();
+        $config = (new Config(Ranks::getInstance()->getDataFolder() . "ranks.yml", Config::YAML))->getAll();
         $ranks = [];
         foreach ($config['ranks'] as $rankName => $rankData) {
             $ranks[$rankName] = $rankData['rank_display'];
