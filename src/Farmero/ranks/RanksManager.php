@@ -9,6 +9,8 @@ use pocketmine\utils\Config;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 
+use Farmero\ranks\Ranks;
+
 class RanksManager {
 
     private $ranksData;
