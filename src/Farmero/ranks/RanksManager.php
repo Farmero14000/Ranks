@@ -26,21 +26,21 @@ class RanksManager {
         $this->loadRanksConfig();
     }
 
-    private function loadRanks(): void {
+    public function loadRanks(): void {
         $this->ranksData = (new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON))->getAll();
     }
 
-    private function loadTempRanks(): void {
+    public function loadTempRanks(): void {
         $this->tempRanksData = [];
     }
 
-    private function saveRanks(): void {
+    public function saveRanks(): void {
         $config = new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON);
         $config->setAll($this->ranksData);
         $config->save();
     }
 
-    private function loadRanksConfig(): void {
+    public function loadRanksConfig(): void {
         $this->ranksConfig = (new Config(Ranks::getInstance()->getDataFolder() . "ranks.yml", Config::YAML))->getAll();
         $this->defaultRank = $this->ranksConfig['default_rank'] ?? null;
     }
@@ -114,7 +114,7 @@ class RanksManager {
         $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName());
     }
 
-    private function assignPermissions(Player $player): void {
+    public function assignPermissions(Player $player): void {
         $rank = $this->getRank($player);
         $permissions = $this->getRankPermissions($rank);
         if ($permissions !== null) {
@@ -124,7 +124,7 @@ class RanksManager {
         }
     }
 
-    private function removePermissions(Player $player): void {
+    public function removePermissions(Player $player): void {
         $rank = $this->getRank($player);
         $permissions = $this->getRankPermissions($rank);
         if ($permissions !== null) {
@@ -148,7 +148,7 @@ class RanksManager {
         }
     }
 
-    private function parseTimeToSeconds(string $time): int|false {
+    public function parseTimeToSeconds(string $time): int|false {
         $regex = '/^(\d+d)?(\d+h)?(\d+m)?(\d+s)?$/';
         if (preg_match($regex, $time, $matches)) {
             $days = isset($matches[1]) ? (int)substr($matches[1], 0, -1) * 86400 : 0;
@@ -160,7 +160,7 @@ class RanksManager {
         return false;
     }
 
-    private function saveTempRanks(): void {
+    public function saveTempRanks(): void {
         $config = new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON);
         $config->set("temp_ranks", $this->tempRanksData);
         $config->save();
@@ -182,7 +182,7 @@ class RanksManager {
         return $this->tempRanksData[$player->getName()] ?? null;
     }
 
-    private function formatTime(int $seconds): string {
+    public function formatTime(int $seconds): string {
         $days = floor($seconds / (3600 * 24));
         $hours = floor(($seconds % (3600 * 24)) / 3600);
         $minutes = floor(($seconds % 3600) / 60);
