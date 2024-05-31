@@ -135,12 +135,29 @@ class RanksManager {
     }
 
     public function setTempRank(Player $player, string $rank, string $time): void {
-        $this->tempRanksData[$player->getName()] = [
-            'rank' => $rank,
-            'expiry' => strtotime("+" . $time)
-        ];
-        Ranks::getInstance()->getScheduler()->scheduleRepeatingTask(new TempRankTask($player, $rank, $this->tempRanksData[$player->getName()]['expiry']), 20);
-        $this->saveTempRanks();
+        $expiryTime = $this->parseTimeToSeconds($time);
+        if ($expiryTime !== false) {
+            $this->tempRanksData[$player->getName()] = [
+                'rank' => $rank,
+                'expiry' => $expiryTime
+            ];
+            Ranks::getInstance()->getScheduler()->scheduleRepeatingTask(new TempRankTask($player, $rank, $expiryTime), 20);
+            $this->saveTempRanks();
+        } else {
+            $player->sendMessage("Invalid time format. Use a format like '1d3h30m' for 1 day, 3 hours, and 30 minutes.");
+        }
+    }
+
+    private function parseTimeToSeconds(string $time): int|false {
+        $regex = '/^(\d+d)?(\d+h)?(\d+m)?(\d+s)?$/';
+        if (preg_match($regex, $time, $matches)) {
+            $days = isset($matches[1]) ? (int)substr($matches[1], 0, -1) * 86400 : 0;
+            $hours = isset($matches[2]) ? (int)substr($matches[2], 0, -1) * 3600 : 0;
+            $minutes = isset($matches[3]) ? (int)substr($matches[3], 0, -1) * 60 : 0;
+            $seconds = isset($matches[4]) ? (int)substr($matches[4], 0, -1) : 0;
+            return $days + $hours + $minutes + $seconds;
+        }
+        return false;
     }
 
     private function saveTempRanks(): void {
