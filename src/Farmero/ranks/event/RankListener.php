@@ -22,7 +22,16 @@ class RankListener implements Listener {
 
     public function onPlayerChat(PlayerChatEvent $event) {
         $player = $event->getPlayer();
-        $rankDisplay = Ranks::getInstance()->getRanksManager()->getRankDisplay(Ranks::getInstance()->getRanksManager()->getRank($player));
+        $ranksManager = Ranks::getInstance()->getRanksManager();
+        $rank = $ranksManager->getRank($player);
+        $rankDisplay = $ranksManager->getRankDisplay($rank);
+        $tempRankData = $ranksManager->getTempRankData($player);
+        if ($tempRankData !== null) {
+            $tempRankDisplay = $ranksManager->getRankDisplay($tempRankData['rank']);
+            $timeLeft = $tempRankData['expiry'];
+            $formattedTime = $ranksManager->formatTime($timeLeft);
+            $rankDisplay .= " (TempRank: $tempRankDisplay $formattedTime)";
+        }
         $event->setFormatter(new LegacyRawChatFormatter(TF::GREEN . "[" . $rankDisplay . "] " . $player->getName() . ": " . $event->getMessage()));
     }
 }
