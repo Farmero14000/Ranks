@@ -11,6 +11,8 @@ use pocketmine\permission\PermissionManager;
 
 use Farmero\ranks\Ranks;
 
+use Farmero\ranks\task\TempRankTask;
+
 class RanksManager {
 
     private $ranksData;
@@ -19,11 +21,16 @@ class RanksManager {
 
     public function __construct() {
         $this->loadRanks();
+        $this->loadTempRanks();
         $this->loadRanksConfig();
     }
 
     private function loadRanks(): void {
         $this->ranksData = (new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON))->getAll();
+    }
+
+    private function loadTempRanks(): void {
+        $this->tempRanksData = [];
     }
 
     private function saveRanks(): void {
@@ -124,5 +131,55 @@ class RanksManager {
                 $player->addAttachment(Ranks::getInstance(), $permission, false);
             }
         }
+    }
+
+    public function setTempRank(Player $player, string $rank, string $time): void {
+        $this->tempRanksData[$player->getName()] = [
+            'rank' => $rank,
+            'expiry' => strtotime("+" . $time)
+        ];
+        Ranks::getInstance()->getScheduler()->scheduleRepeatingTask(new TempRankTask($player, $rank, $this->tempRanksData[$player->getName()]['expiry']), 20);
+        $this->saveTempRanks();
+    }
+
+    private function saveTempRanks(): void {
+        $config = new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON);
+        $config->set("temp_ranks", $this->tempRanksData);
+        $config->save();
+    }
+
+    public function updateTempRankDisplay(Player $player, string $rank, int $timeLeft): void {
+        $rankDisplay = $this->getRankDisplay($rank);
+        $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName() . " (TempRank: " . $this->formatTime($timeLeft) . ")");
+    }
+
+    public function removeTempRank(Player $player): void {
+        if (isset($this->tempRanksData[$player->getName()])) {
+            unset($this->tempRanksData[$player->getName()]);
+            $this->updatePlayerDisplayName($player);
+        }
+    }
+
+    private function formatTime(int $seconds): string {
+        $days = floor($seconds / (3600 * 24));
+        $hours = floor(($seconds % (3600 * 24)) / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $seconds = $seconds % 60;
+
+        $timeString = "";
+        if ($days > 0) {
+            $timeString .= $days . "d ";
+        }
+        if ($hours > 0) {
+            $timeString .= $hours . "h ";
+        }
+        if ($minutes > 0) {
+            $timeString .= $minutes . "m ";
+        }
+        if ($seconds > 0) {
+            $timeString .= $seconds . "s";
+        }
+
+        return trim($timeString);
     }
 }
