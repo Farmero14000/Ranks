@@ -25,6 +25,7 @@ class Ranks extends PluginBase {
         $this->saveResource("ranks.yml");
         $this->ranksManager = new RanksManager();
         $this->getServer()->getCommandMap()->register("Ranks", new RanksCommand());
+        $this->getServer()->getCommandMap()->register("Ranks"), new TempRankCommand());
         $this->getServer()->getPluginManager()->registerEvents(new RankListener(), $this);
     }
 
