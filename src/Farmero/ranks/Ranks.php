@@ -26,7 +26,6 @@ class Ranks extends PluginBase {
         $this->ranksManager = new RanksManager($this);
         $this->getServer()->getCommandMap()->register("Ranks", new RanksCommand());
         $this->getServer()->getPluginManager()->registerEvents(new RankListener(), $this);
-        $this->ranksManager->loadPlayerRanks();
     }
 
     public static function getInstance(): self {
