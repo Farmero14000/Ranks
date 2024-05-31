@@ -6,8 +6,8 @@ namespace Farmero\ranks;
 
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
-
-use Farmero\ranks\Ranks;
+use pocketmine\permission\Permission;
+use pocketmine\permission\PermissionManager;
 
 class RanksManager {
 
@@ -37,8 +37,10 @@ class RanksManager {
 
     public function setRank(Player $player, string $rank): void {
         if ($this->rankExists($rank)) {
+            $this->removePermissions($player);
             $this->ranksData[$player->getName()] = $rank;
             $this->saveRanks();
+            $this->assignPermissions($player);
             $this->updatePlayerDisplayName($player);
         } else {
             $player->sendMessage("The rank $rank does not exist.");
@@ -51,6 +53,7 @@ class RanksManager {
 
     public function removeRank(Player $player): void {
         if (isset($this->ranksData[$player->getName()])) {
+            $this->removePermissions($player);
             unset($this->ranksData[$player->getName()]);
             $this->saveRanks();
             $this->updatePlayerDisplayName($player);
@@ -81,6 +84,7 @@ class RanksManager {
         if (!isset($this->ranksData[$player->getName()])) {
             $this->ranksData[$player->getName()] = $this->defaultRank;
             $this->saveRanks();
+            $this->assignPermissions($player);
             $this->updatePlayerDisplayName($player);
         }
     }
@@ -89,5 +93,25 @@ class RanksManager {
         $rank = $this->getRank($player);
         $rankDisplay = $this->getRankDisplay($rank);
         $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName());
+    }
+
+    private function assignPermissions(Player $player): void {
+        $rank = $this->getRank($player);
+        $permissions = $this->getRankPermissions($rank);
+        if ($permissions !== null) {
+            foreach ($permissions as $permission) {
+                $player->addAttachment(Ranks::getInstance(), $permission, true);
+            }
+        }
+    }
+
+    private function removePermissions(Player $player): void {
+        $rank = $this->getRank($player);
+        $permissions = $this->getRankPermissions($rank);
+        if ($permissions !== null) {
+            foreach ($permissions as $permission) {
+                $player->addAttachment(Ranks::getInstance(), $permission, false);
+            }
+        }
     }
 }
