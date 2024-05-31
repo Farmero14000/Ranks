@@ -28,7 +28,7 @@ class TempRankTask extends Task {
             if ($this->timeLeft > 0) {
                 $this->timeLeft--;
                 $ranksManager->updateTempRankDisplay($this->player, $this->rank, $this->timeLeft);
-                $this->player->getServer()->getScheduler()->scheduleDelayedTask(new self($this->player, $this->rank, $this->timeLeft), 20);
+                Ranks::getInstance()->getScheduler()->scheduleDelayedTask(new self($this->player, $this->rank, $this->timeLeft), 20);
             } else {
                 $ranksManager->removeTempRank($this->player);
             }
