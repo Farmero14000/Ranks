@@ -31,7 +31,7 @@ class RanksManager {
     }
 
     private function loadRanksConfig(): void {
-        $this->ranksConfig = (new Config(Ranks::getInstance()->getDataFolder() . "Ranks.yml", Config::YAML))->getAll();
+        $this->ranksConfig = (new Config(Ranks::getInstance()->getDataFolder() . "ranks.yml", Config::YAML))->getAll();
         $this->defaultRank = $this->ranksConfig['default_rank'] ?? null;
     }
 
