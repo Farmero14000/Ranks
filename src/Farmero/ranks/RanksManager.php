@@ -7,31 +7,31 @@ namespace Farmero\ranks;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 
+use Farmero\ranks\Ranks;
+
 class RanksManager {
 
-    private $plugin;
     private $ranksData;
     private $ranksConfig;
     private $defaultRank;
 
-    public function __construct(Ranks $plugin) {
-        $this->plugin = $plugin;
+    public function __construct() 
         $this->loadRanks();
         $this->loadRanksConfig();
     }
 
     private function loadRanks(): void {
-        $this->ranksData = (new Config($this->plugin->getDataFolder() . "player_ranks.json", Config::JSON))->getAll();
+        $this->ranksData = (new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON))->getAll();
     }
 
     private function saveRanks(): void {
-        $config = new Config($this->plugin->getDataFolder() . "player_ranks.json", Config::JSON);
+        $config = new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON);
         $config->setAll($this->ranksData);
         $config->save();
     }
 
     private function loadRanksConfig(): void {
-        $this->ranksConfig = (new Config($this->plugin->getDataFolder() . "Ranks.yml", Config::YAML))->getAll();
+        $this->ranksConfig = (new Config(Ranks::getInstance()->getDataFolder() . "Ranks.yml", Config::YAML))->getAll();
         $this->defaultRank = $this->ranksConfig['default_rank'] ?? null;
     }
 
