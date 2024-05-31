@@ -15,7 +15,7 @@ class RanksManager {
     private $ranksConfig;
     private $defaultRank;
 
-    public function __construct() 
+    public function __construct() {
         $this->loadRanks();
         $this->loadRanksConfig();
     }
