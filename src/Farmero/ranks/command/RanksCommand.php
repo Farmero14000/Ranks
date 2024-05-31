@@ -14,59 +14,86 @@ class RanksCommand extends Command {
 
     private $plugin;
 
-    public function __construct(Ranks $plugin) {
+    public function __construct() {
         parent::__construct("rank");
         $this->setLabel("rank");
         $this->setDescription("Set or Remove a players rank");
         $this->setAliases(["r", "ranks"]);
         $this->setPermission("ranks.cmd");
-        $this->plugin = $plugin;
     }
 
-    public function execute(CommandSender $sender, string $label, array $args): bool {
-        if (!$this->testPermission($sender)) {
+    public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
+        if (!$sender instanceof Player) {
+            $sender->sendMessage("This command can only be used in-game!");
             return false;
         }
 
-        if (count($args) < 2) {
-            $sender->sendMessage("Usage: /rank <set|remove|get> <player> [rank]");
+        if (count($args) < 1) {
+            $sender->sendMessage("Usage: /ranks <set|remove|list> <player> [rank]");
             return false;
         }
 
         $subCommand = strtolower($args[0]);
-        $player = $this->plugin->getServer()->getPlayerByPrefix($args[1]);
-
-        if (!$player instanceof Player) {
-            $sender->sendMessage("Player not found... Try again!");
-            return false;
-        }
+        $ranksManager = Ranks::getInstance()->getRanksManager();
 
         switch ($subCommand) {
             case "set":
                 if (count($args) < 3) {
-                    $sender->sendMessage("Usage: /rank set <player> <rank>");
+                    $sender->sendMessage("Usage: /ranks set <player> <rank>");
                     return false;
                 }
+
+                $targetName = $args[1];
                 $rank = $args[2];
-                $this->plugin->getRanksManager()->setRank($player, $rank);
-                $sender->sendMessage("Rank $rank set for player " . $player->getName());
+                $target = Ranks::getInstance()->getServer()->getPlayerByPrefix($targetName);
+
+                if ($target === null) {
+                    $sender->sendMessage($target->getName() . "does not exist...");
+                    return false;
+                }
+
+                if (!$ranksManager->rankExists($rank)) {
+                    $sender->sendMessage("The rank $rank does not exist...");
+                    return false;
+                }
+
+                $ranksManager->setRank($target, $rank);
+                $sender->sendMessage("Set the rank of " . $target->getName() . " to " . $rank . "!");
                 break;
 
             case "remove":
-                $this->plugin->getRanksManager()->removeRank($player);
-                $sender->sendMessage("Rank removed from player " . $player->getName());
+                if (count($args) < 2) {
+                    $sender->sendMessage("Usage: /ranks remove <player>");
+                    return false;
+                }
+
+                $targetName = $args[1];
+                $target = Ranks::getInstance()->getServer()->getPlayerByPrefix($targetName);
+
+                if ($target === null) {
+                    $sender->sendMessage($target->getName() . " does not exist...");
+                    return false;
+                }
+
+                $ranksManager->removeRank($target);
+                $sender->sendMessage("Removed the rank of " . $target->getName() . "!");
                 break;
 
-            case "get":
-                $rank = $this->plugin->getRanksManager()->getRank($player);
-                $sender->sendMessage("The player " . $player->getName() . " has rank the $rank");
+            case "list":
+                $ranks = $ranksManager->rankHierarchy();
+                if (empty($ranks)) {
+                    $sender->sendMessage("No ranks found...");
+                    return false;
+                }
+
+                $rankList = implode(", ", $ranks);
+                $sender->sendMessage("Available ranks: " . $rankList);
                 break;
 
             default:
-                $sender->sendMessage("Usage: /rank <set|remove|get> <player> [rank]");
+                $sender->sendMessage("Usage: /ranks <set|remove|list> <player> [rank]");
                 return false;
         }
-
         return true;
     }
 }
