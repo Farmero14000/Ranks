@@ -17,7 +17,7 @@ class RankListener implements Listener {
     public function onJoin(PlayerJoinEvent $event) {
         $player = $event->getPlayer();
         Ranks::getInstance()->getRanksManager()->createPlayerProfile($player);
-        $this->plugin->updatePlayerDisplayName($player);
+        Ranks::getInstance()->getRanksManager()->updatePlayerDisplayName($player);
     }
 
     public function onPlayerChat(PlayerChatEvent $event) {
