@@ -9,7 +9,7 @@ use pocketmine\plugin\PluginBase;
 use Farmero\ranks\RanksManager;
 
 use Farmero\ranks\command\RanksCommand;
-use Farmero\ranks\command\TempRanksCommand;
+use Farmero\ranks\command\TempRankCommand;
 
 use Farmero\ranks\event\RankListener;
 
