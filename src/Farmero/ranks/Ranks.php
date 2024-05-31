@@ -24,7 +24,7 @@ class Ranks extends PluginBase {
     public function onEnable(): void {
         $this->saveResource("ranks.yml");
         $this->ranksManager = new RanksManager($this);
-        $this->getServer()->getCommandMap()->register("Ranks", new RanksCommand($this));
+        $this->getServer()->getCommandMap()->register("Ranks", new RanksCommand());
         $this->getServer()->getPluginManager()->registerEvents(new RankListener(), $this);
         $this->ranksManager->loadPlayerRanks();
     }
