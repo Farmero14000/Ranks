@@ -46,7 +46,7 @@ class RanksCommand extends Command {
                 $target = Ranks::getInstance()->getServer()->getPlayerByPrefix($targetName);
 
                 if ($target === null) {
-                    $sender->sendMessage($target->getName() . "does not exist...");
+                    $sender->sendMessage("Player not found...");
                     return false;
                 }
 
@@ -69,7 +69,7 @@ class RanksCommand extends Command {
                 $target = Ranks::getInstance()->getServer()->getPlayerByPrefix($targetName);
 
                 if ($target === null) {
-                    $sender->sendMessage($target->getName() . " does not exist...");
+                    $sender->sendMessage("Player not found...");
                     return false;
                 }
 
