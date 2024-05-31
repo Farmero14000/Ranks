@@ -53,6 +53,15 @@ class RanksManager {
         return $this->ranksData[$player->getName()] ?? $this->defaultRank;
     }
 
+    public function getAllRanks(): array {
+        $config = $this->getConfig()->getAll();
+        $ranks = [];
+        foreach ($config['ranks'] as $rankName => $rankData) {
+            $ranks[$rankName] = $rankData['rank_display'];
+        }
+        return $ranks;
+    }
+
     public function removeRank(Player $player): void {
         if (isset($this->ranksData[$player->getName()])) {
             $this->removePermissions($player);
