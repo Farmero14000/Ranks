@@ -7,3 +7,5 @@ main: Farmero\ranks\Ranks
 permissions:
   ranks.cmd:
     default: op
+  ranks.temprank:
+    default: op
