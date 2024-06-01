@@ -110,12 +110,10 @@ class RanksManager {
 
     public function setRankTag(string $rank, string $tag): void {
         $this->ranksConfig['ranks'][$rank]['rank_player_tag'] = $tag;
-        $this->saveRanksConfig();
     }
 
     public function setChatFormat(string $rank, string $format): void {
         $this->ranksConfig['ranks'][$rank]['rank_chat_format'] = $format;
-        $this->saveRanksConfig();
     }
 
     public function createPlayerProfile(Player $player): void {
