@@ -100,6 +100,24 @@ class RanksManager {
         return $this->ranksConfig['ranks'][$rank]['rank_display'] ?? $rank;
     }
 
+    public function getRankTag(string $rank): ?string {
+        return $this->ranksConfig['ranks'][$rank]['rank_player_tag'] ?? null;
+    }
+
+    public function getChatFormat(string $rank): ?string {
+        return $this->ranksConfig['ranks'][$rank]['rank_chat_format'] ?? null;
+    }
+
+    public function setRankTag(string $rank, string $tag): void {
+        $this->ranksConfig['ranks'][$rank]['rank_player_tag'] = $tag;
+        $this->saveRanksConfig();
+    }
+
+    public function setChatFormat(string $rank, string $format): void {
+        $this->ranksConfig['ranks'][$rank]['rank_chat_format'] = $format;
+        $this->saveRanksConfig();
+    }
+
     public function createPlayerProfile(Player $player): void {
         if (!isset($this->ranksData[$player->getName()])) {
             $this->ranksData[$player->getName()] = $this->defaultRank;
@@ -111,8 +129,9 @@ class RanksManager {
 
     public function updatePlayerDisplayName(Player $player): void {
         $rank = $this->getRank($player);
-        $rankDisplay = $this->getRankDisplay($rank);
-        $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName());
+        $rankTag = $rank ? $this->getRankTag($rank) : "{playerName}";
+        $displayName = str_replace("{playerName}", $player->getName(), $rankTag);
+        $player->setDisplayName($displayName);
     }
 
     public function assignPermissions(Player $player): void {
