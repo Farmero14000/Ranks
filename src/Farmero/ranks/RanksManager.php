@@ -7,7 +7,6 @@ namespace Farmero\ranks;
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\permission\PermissionAttachment;
-use pocketmine\permission\PermissionManager;
 
 use Farmero\ranks\Ranks;
 
@@ -76,6 +75,7 @@ class RanksManager {
             $this->removePermissions($player);
             unset($this->ranksData[$player->getName()]);
             $this->saveRanks();
+            $this->assignPermissions($player); // Reassign default rank permissions
             $this->updatePlayerDisplayName($player);
         }
     }
@@ -115,55 +115,23 @@ class RanksManager {
         $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName());
     }
 
-    public function getAttachment(Player $player): ?PermissionAttachment {
-        $nickname = strtolower($player->getName());
-        return $this->attachments[$nickname] ?? null;
-    }
-
-    public function setAttachment(Player $player, PermissionAttachment $attachment): void {
-        $this->attachments[strtolower($player->getName())] = $attachment;
-    }
-
-    public function removeAttachment(Player $player): void {
-        $nickname = strtolower($player->getName());
-        if (isset($this->attachments[$nickname])) {
-            unset($this->attachments[$nickname]);
-        }
-    }
-
-    public function updatePermissions(Player $player): void {
-        $attachment = $this->getAttachment($player);
-        if ($attachment === null) {
-            return;
-        }
-        $attachment->clearPermissions();
-        foreach ($this->getRankPermissions($this->getRank($player)) as $permission) {
-            if ($permission === "*") {
-                foreach (PermissionManager::getInstance()->getPermissions() as $tempPermission) {
-                    $attachment->setPermission($tempPermission->getName(), true);
-                }
-                break;
-            }
-            $attachment->setPermission($permission, true);
-        }
-    }
-
     public function assignPermissions(Player $player): void {
         $rank = $this->getRank($player);
         $permissions = $this->getRankPermissions($rank);
         if ($permissions !== null) {
-            $attachment = $this->getAttachment($player);
-            if ($attachment === null) {
-                $attachment = $player->addAttachment(Ranks::getInstance());
-                $this->setAttachment($player, $attachment);
+            if (!isset($this->attachments[$player->getName()])) {
+                $this->attachments[$player->getName()] = $player->addAttachment(Ranks::getInstance());
             }
-            $this->updatePermissions($player);
+            $attachment = $this->attachments[$player->getName()];
+            foreach ($permissions as $permission) {
+                $attachment->setPermission($permission, true);
+            }
         }
     }
 
     public function removePermissions(Player $player): void {
-        $attachment = $this->getAttachment($player);
-        if ($attachment !== null) {
+        if (isset($this->attachments[$player->getName()])) {
+            $attachment = $this->attachments[$player->getName()];
             $rank = $this->getRank($player);
             $permissions = $this->getRankPermissions($rank);
             if ($permissions !== null) {
@@ -171,7 +139,8 @@ class RanksManager {
                     $attachment->unsetPermission($permission);
                 }
             }
-            $this->removeAttachment($player);
+            $player->removeAttachment($attachment);
+            unset($this->attachments[$player->getName()]);
         }
     }
 
@@ -228,10 +197,20 @@ class RanksManager {
         $hours = floor(($seconds % (3600 * 24)) / 3600);
         $minutes = floor(($seconds % 3600) / 60);
         $seconds = $seconds % 60;
-        return "{$days}d {$hours}h {$minutes}m {$seconds}s";
-    }
 
-    public function getRankCooldown(string $rank): int {
-        return $this->ranksConfig['ranks'][$rank]['cooldown'] ?? 0;
+        $timeString = "";
+        if ($days > 0) {
+            $timeString .= $days . "d ";
+        }
+        if ($hours > 0) {
+            $timeString .= $hours . "h ";
+        }
+        if ($minutes > 0) {
+            $timeString .= $minutes . "m ";
+        }
+        if ($seconds > 0) {
+            $timeString .= $seconds . "s";
+        }
+        return trim($timeString);
     }
 }
