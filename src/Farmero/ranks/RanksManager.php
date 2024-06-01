@@ -6,8 +6,7 @@ namespace Farmero\ranks;
 
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
-use pocketmine\permission\Permission;
-use pocketmine\permission\PermissionManager;
+use pocketmine\permission\PermissionAttachment;
 
 use Farmero\ranks\Ranks;
 
@@ -19,6 +18,7 @@ class RanksManager {
     private $ranksConfig;
     private $defaultRank;
     private $tempRanksData;
+    private $attachments = [];
 
     public function __construct() {
         $this->loadRanks();
@@ -118,18 +118,25 @@ class RanksManager {
         $rank = $this->getRank($player);
         $permissions = $this->getRankPermissions($rank);
         if ($permissions !== null) {
+            if (!isset($this->attachments[$player->getName()])) {
+                $this->attachments[$player->getName()] = $player->addAttachment(Ranks::getInstance());
+            }
+            $attachment = $this->attachments[$player->getName()];
             foreach ($permissions as $permission) {
-                $player->addAttachment(Ranks::getInstance(), $permission, true);
+                $attachment->setPermission($permission, true);
             }
         }
     }
 
     public function removePermissions(Player $player): void {
-        $rank = $this->getRank($player);
-        $permissions = $this->getRankPermissions($rank);
-        if ($permissions !== null) {
-            foreach ($permissions as $permission) {
-                $player->addAttachment(Ranks::getInstance(), $permission, false);
+        if (isset($this->attachments[$player->getName()])) {
+            $attachment = $this->attachments[$player->getName()];
+            $rank = $this->getRank($player);
+            $permissions = $this->getRankPermissions($rank);
+            if ($permissions !== null) {
+                foreach ($permissions as $permission) {
+                    $attachment->unsetPermission($permission);
+                }
             }
         }
     }
@@ -201,7 +208,6 @@ class RanksManager {
         if ($seconds > 0) {
             $timeString .= $seconds . "s";
         }
-
         return trim($timeString);
     }
 }
