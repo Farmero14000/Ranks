@@ -9,7 +9,6 @@ use pocketmine\plugin\PluginBase;
 use Farmero\ranks\RanksManager;
 
 use Farmero\ranks\command\RanksCommand;
-use Farmero\ranks\command\TempRankCommand;
 
 use Farmero\ranks\event\RankListener;
 
@@ -26,7 +25,6 @@ class Ranks extends PluginBase {
         $this->saveResource("ranks.yml");
         $this->ranksManager = new RanksManager();
         $this->getServer()->getCommandMap()->register("Ranks", new RanksCommand());
-        $this->getServer()->getCommandMap()->register("Ranks", new TempRankCommand());
         $this->getServer()->getPluginManager()->registerEvents(new RankListener(), $this);
     }
 
