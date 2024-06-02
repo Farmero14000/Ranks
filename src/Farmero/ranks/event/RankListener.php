@@ -26,4 +26,5 @@ class RankListener implements Listener {
         $rankChatFormat = $rank ? Ranks::getInstance()->getRanksManager()->getChatFormat($rank) : "{playerName}: {message}";
         $formattedMessage = str_replace(["{playerName}", "{message}"], [$player->getName(), $event->getMessage()], $rankChatFormat);
         $event->setFormatter(new LegacyRawChatFormatter($formattedMessage));
+    }
 }
