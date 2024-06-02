@@ -17,18 +17,8 @@ class RankListener implements Listener {
     public function onJoin(PlayerJoinEvent $event) {
         $player = $event->getPlayer();
         $ranksManager = Ranks::getInstance()->getRanksManager();
-        $rank = $ranksManager->getRank($player);
-        $tempRankData = $ranksManager->getTempRankData($player);
-        if ($tempRankData !== null) {
-            $expiryTime = $tempRankData['expiry'];
-            $currentTime = time();
-            $timeLeft = max(0, $expiryTime - $currentTime);
-
-            $ranksManager->updateTempRankDisplay($player, $rank, $timeLeft);
-        } else {
-            $ranksManager->updatePlayerDisplayName($player);
-        }
         $ranksManager->createPlayerProfile($player);
+        $ranksManager->updatePlayerDisplayName($player);
     }
 
     public function onPlayerChat(PlayerChatEvent $event) {
@@ -36,13 +26,6 @@ class RankListener implements Listener {
         $ranksManager = Ranks::getInstance()->getRanksManager();
         $rank = $ranksManager->getRank($player);
         $rankDisplay = $ranksManager->getRankDisplay($rank);
-        $tempRankData = $ranksManager->getTempRankData($player);
-        if ($tempRankData !== null) {
-            $tempRankDisplay = $ranksManager->getRankDisplay($tempRankData['rank']);
-            $timeLeft = $tempRankData['expiry'];
-            $formattedTime = $ranksManager->formatTime($timeLeft);
-            $rankDisplay .= " (TempRank: $tempRankDisplay $formattedTime)";
-        }
         $event->setFormatter(new LegacyRawChatFormatter(TF::GREEN . "[" . $rankDisplay . "] " . $player->getName() . ": " . $event->getMessage()));
     }
 }
