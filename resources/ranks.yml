@@ -2,19 +2,27 @@ default_rank: "member"
 
 ranks:
   member:
-    rank_display: "Member"
+    rank_display: Member
+    rank_player_tag: "Member {playerName}"
+    rank_chat_format: "Member {playerName}: {message}"
     permissions:
       - "example.permission3"
   vip:
-    rank_display: "VIP"
+    rank_display: VIP
+    rank_player_tag: "VIP {playerName}"
+    rank_chat_format: "VIP {playerName}: {message}"
     permissions:
       - "example.permission4"
   admin:
-    rank_display: "Admin"
+    rank_display: Admin
+    rank_player_tag: "Admin {playerName}"
+    rank_chat_format: "Admin {playerName}: {message}"
     permissions:
       - "example.permission5"
   owner:
-    rank_display: "Owner"
+    rank_display: Owner
+    rank_player_tag: "Owner {playerName}"
+    rank_chat_format: "Owner {playerName}: {message}"
     permissions:
       - "example.permission6"
 
