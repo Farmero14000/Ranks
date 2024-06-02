@@ -10,28 +10,20 @@ use pocketmine\permission\PermissionAttachment;
 
 use Farmero\ranks\Ranks;
 
-use Farmero\ranks\task\TempRankTask;
-
 class RanksManager {
 
     private $ranksData;
     private $ranksConfig;
     private $defaultRank;
-    private $tempRanksData;
     private $attachments = [];
 
     public function __construct() {
         $this->loadRanks();
-        $this->loadTempRanks();
         $this->loadRanksConfig();
     }
 
     public function loadRanks(): void {
         $this->ranksData = (new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON))->getAll();
-    }
-
-    public function loadTempRanks(): void {
-        $this->tempRanksData = [];
     }
 
     public function saveRanks(): void {
@@ -159,75 +151,5 @@ class RanksManager {
             $player->removeAttachment($attachment);
             unset($this->attachments[$player->getName()]);
         }
-    }
-
-    public function setTempRank(Player $player, string $rank, string $time): void {
-        $expiryTime = $this->parseTimeToSeconds($time);
-        if ($expiryTime !== false) {
-            $this->tempRanksData[$player->getName()] = [
-                'rank' => $rank,
-                'expiry' => $expiryTime
-            ];
-            Ranks::getInstance()->getScheduler()->scheduleRepeatingTask(new TempRankTask($player, $rank, $expiryTime), 20);
-            $this->saveTempRanks();
-        } else {
-            $player->sendMessage("Invalid time format. Use a format like '1d3h30m' for 1 day, 3 hours, and 30 minutes.");
-        }
-    }
-
-    public function parseTimeToSeconds(string $time): int|false {
-        $regex = '/^(\d+d)?(\d+h)?(\d+m)?(\d+s)?$/';
-        if (preg_match($regex, $time, $matches)) {
-            $days = isset($matches[1]) ? (int)substr($matches[1], 0, -1) * 86400 : 0;
-            $hours = isset($matches[2]) ? (int)substr($matches[2], 0, -1) * 3600 : 0;
-            $minutes = isset($matches[3]) ? (int)substr($matches[3], 0, -1) * 60 : 0;
-            $seconds = isset($matches[4]) ? (int)substr($matches[4], 0, -1) : 0;
-            return $days + $hours + $minutes + $seconds;
-        }
-        return false;
-    }
-
-    public function saveTempRanks(): void {
-        $config = new Config(Ranks::getInstance()->getDataFolder() . "player_ranks.json", Config::JSON);
-        $config->set("temp_ranks", $this->tempRanksData);
-        $config->save();
-    }
-
-    public function updateTempRankDisplay(Player $player, string $rank, int $timeLeft): void {
-        $rankDisplay = $this->getRankDisplay($rank);
-        $player->setDisplayName("[" . $rankDisplay . "] " . $player->getName() . " (TempRank: " . $this->formatTime($timeLeft) . ")");
-    }
-
-    public function removeTempRank(Player $player): void {
-        if (isset($this->tempRanksData[$player->getName()])) {
-            unset($this->tempRanksData[$player->getName()]);
-            $this->updatePlayerDisplayName($player);
-        }
-    }
-
-    public function getTempRankData(Player $player): ?array {
-        return $this->tempRanksData[$player->getName()] ?? null;
-    }
-
-    public function formatTime(int $seconds): string {
-        $days = floor($seconds / (3600 * 24));
-        $hours = floor(($seconds % (3600 * 24)) / 3600);
-        $minutes = floor(($seconds % 3600) / 60);
-        $seconds = $seconds % 60;
-
-        $timeString = "";
-        if ($days > 0) {
-            $timeString .= $days . "d ";
-        }
-        if ($hours > 0) {
-            $timeString .= $hours . "h ";
-        }
-        if ($minutes > 0) {
-            $timeString .= $minutes . "m ";
-        }
-        if ($seconds > 0) {
-            $timeString .= $seconds . "s";
-        }
-        return trim($timeString);
     }
 }
